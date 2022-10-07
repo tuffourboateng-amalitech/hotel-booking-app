@@ -2,6 +2,7 @@ import { prisma } from '../config/prismaInit';
 import { Request, Response, NextFunction } from 'express';
 import { Hotel } from '../@types';
 import { Room } from '@prisma/client';
+import createHttpError from 'http-errors';
 
 
 // create a hotel
@@ -10,6 +11,12 @@ export const createHotel = async (
   res: Response,
   next: NextFunction
 ) => {
+  const permittedUser = await prisma.user.findFirst({
+    where:{
+      id: req["payload"].id
+    }
+  })
+  if(!(["Admin"].includes(permittedUser?.role))) throw new createHttpError.Forbidden("Unauthorized to perform this duty")
   try {
     const {
       name,
@@ -51,9 +58,10 @@ export const findHotel = async(req:Request, res:Response, next:NextFunction) => 
     const id = req.params.id
     const hotelfind = await prisma.hotel.findFirst({
       where:{
-        id
+        id: id
       },
       select:{
+        id: true,
         name: true,
         address: true,
         city: true,
@@ -89,6 +97,14 @@ export const findHotel = async(req:Request, res:Response, next:NextFunction) => 
 
 export const updateHotel = async(req:Request, res:Response, next:NextFunction) => {
   try {
+    const permittedUser = await prisma.user.findFirst({
+      where:{
+        id: req["payload"].id
+      }
+    })
+    if(!(["Admin"].includes(permittedUser?.role))) throw new createHttpError.Forbidden("Unauthorized to perform this duty")
+
+
     const id = req.params.id
     const {
       name,
@@ -129,6 +145,13 @@ export const updateHotel = async(req:Request, res:Response, next:NextFunction) =
 // Delete a hotel
 export const deleteHotel = async (req:Request, res:Response, next:NextFunction) => {
   try {
+    const permittedUser = await prisma.user.findFirst({
+      where:{
+        id: req.user?.id
+      }
+    })
+    if(permittedUser?.role !== "Admin") throw new createHttpError.Forbidden("Unauthorized to perform this duty")
+
     const id = req.params.id
     const hotelDelete = await prisma.hotel.delete({
       where:{
@@ -140,3 +163,38 @@ export const deleteHotel = async (req:Request, res:Response, next:NextFunction) 
     next(error)
   }
 }  
+
+// get all hotels
+export const allHotels = async (req:Request, res:Response, next:NextFunction) => {
+  try {
+    const getAllHotels = await prisma.hotel.findMany({
+      select:{
+        id: true,
+        name: true,
+        address: true,
+        city: true,
+        description: true,
+        distance: true,
+        rooms:{
+          select:{
+            id: true,
+            hotelId: true,
+            title: true,
+            description: true,
+            price: true,
+            maxPeople: true,
+            roomNumbers: true
+          }
+        },
+        featured: true,
+        price: true,
+        type: true,
+        rating: true,
+        photos: true
+      }
+    })
+    res.status(200).json({getAllHotels, success: true})
+  } catch (error) {
+    next(error)
+  }
+}

@@ -5,7 +5,7 @@ import { createAccessToken } from '../helpers/jwtAccessToken';
 import { createRefreshToken } from '../helpers/jwtRefreshToken';
 import { refreshTokens } from './renewToken.controller';
 import createHttpError from 'http-errors';
-import { User } from '../@types';
+import { CreateUser } from '../@types';
 import { Role } from '@prisma/client';
 
 // token maximum age
@@ -18,7 +18,7 @@ export const register = async (
   next: NextFunction
 ) => {
   try {
-    const { name, email, password, confirmPassword } = req.body as User;
+    const { name, email, password, confirmPassword } = req.body as CreateUser;
     if (password !== confirmPassword) {
       // check if password matches
       throw new createHttpError.ExpectationFailed('Passwords do not match');
@@ -54,7 +54,7 @@ export const loginUser = async (
   next: NextFunction
 ) => {
   try {
-    const { email, password } = req.body as User;
+    const { email, password } = req.body as CreateUser;
 
     // Find Incoming user in our database
     const checkUser = await prisma.user.findUnique({

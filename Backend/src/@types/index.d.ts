@@ -1,3 +1,5 @@
+import {User} from '@prisma/client'
+
 declare global {
     namespace Express {
       export interface Request {
@@ -15,7 +17,7 @@ declare global {
   }
 
 
-export interface User {
+export interface CreateUser {
     id: string;
     name: string
     email: string
@@ -46,3 +48,4 @@ export interface Room{
   description: string,
   roomNumbers: object[]
 }
+

@@ -1,10 +1,17 @@
 import { Request, Response, NextFunction } from 'express';
+import createHttpError from 'http-errors';
 import {Room } from '../@types';
 import { prisma } from '../config/prismaInit';
 
 
 export const createRoom = async (req:Request, res:Response, next:NextFunction) => {
     try {
+        const permittedUser = await prisma.user.findFirst({
+            where:{
+              id: req.user?.id
+            }
+          })
+        if(permittedUser?.role !== "Admin") throw new createHttpError.Forbidden("Unauthorized to perform this duty")
         const hotelId = req.params.id
         const {title, price, maxPeople, description, roomNumbers} = req.body as Room
         const newRoom = await prisma.room.create({
@@ -45,6 +52,13 @@ export const getRoom = async (req:Request, res:Response, next:NextFunction) => {
 
 export const updateRoom = async(req:Request, res:Response, next:NextFunction) => {
     try {
+        const permittedUser = await prisma.user.findFirst({
+            where:{
+              id: req.user?.id
+            }
+          })
+          if(permittedUser?.role !== "Admin") throw new createHttpError.Forbidden("Unauthorized to perform this duty")
+
         const hotelId = req.params.id
         const {title, price, maxPeople, description, roomNumbers} = req.body 
         const roomUpdate = await prisma.room.update({
@@ -73,6 +87,13 @@ export const updateRoom = async(req:Request, res:Response, next:NextFunction) =>
 
 export const deleteRoom = async (req:Request, res:Response, next:NextFunction) => {
     try {
+        const permittedUser = await prisma.user.findFirst({
+            where:{
+              id: req.user?.id
+            }
+          })
+          if(permittedUser?.role !== "Admin") throw new createHttpError.Forbidden("Unauthorized to perform this duty")
+
         const roomDelete = await prisma.room.delete({
             where:{
                 id: parseInt(req.params.id)

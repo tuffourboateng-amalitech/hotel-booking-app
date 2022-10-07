@@ -1,6 +1,6 @@
 import { Role } from '@prisma/client';
 import {Request, Response, NextFunction} from 'express';
-import { User } from '../@types';
+import { CreateUser } from '../@types';
 import { prisma } from '../config/prismaInit';
 
 
@@ -53,7 +53,7 @@ export const deleteUser = async (req:Request, res:Response, next:NextFunction) =
 }
 export const updateUser = async (req:Request, res:Response, next:NextFunction) => {
     try {
-        const {name, email, password} = req.body as User
+        const {name, email, password} = req.body as CreateUser
         const userDelete = await prisma.user.update({
             where:{
                 id: req.params.id
