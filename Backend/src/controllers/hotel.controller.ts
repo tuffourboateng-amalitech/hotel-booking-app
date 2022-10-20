@@ -1,7 +1,6 @@
 import { prisma } from '../config/prismaInit';
 import { Request, Response, NextFunction } from 'express';
 import { Hotel } from '../@types';
-import { Room } from '@prisma/client';
 import createHttpError from 'http-errors';
 
 
@@ -164,10 +163,34 @@ export const deleteHotel = async (req:Request, res:Response, next:NextFunction) 
   }
 }  
 
+
+interface queryHotel{
+  max:number;
+  min:number;
+}
+
 // get all hotels
 export const allHotels = async (req:Request, res:Response, next:NextFunction) => {
   try {
+    const {max, min} = <unknown>req.query as queryHotel
     const getAllHotels = await prisma.hotel.findMany({
+      where:{
+        featured: {
+          equals: true
+        },
+        OR:[
+          {
+            price: {
+              gte: min | 1
+            }
+          },
+          {
+            price:{
+              lte: max | 999
+            }
+          }
+        ]
+      },
       select:{
         id: true,
         name: true,
@@ -191,9 +214,87 @@ export const allHotels = async (req:Request, res:Response, next:NextFunction) =>
         type: true,
         rating: true,
         photos: true
-      }
+      },
+      take:4
     })
     res.status(200).json({getAllHotels, success: true})
+  } catch (error) {
+    next(error)
+  }
+}
+
+
+export const countByCity = async (req:Request, res:Response, next:NextFunction) => {
+  try {
+    const cities = (<string>req.query.cities).split(",")
+    const list = await Promise.all(cities.map(city => {
+      return prisma.hotel.count({
+        where:{
+          city
+        }
+      })
+    }))
+    res.json({list, success: true})
+  } catch (error) {
+   next(error) 
+  }
+}
+
+export const countByType = async (req:Request, res:Response, next:NextFunction) => {
+  try {
+    const hotelCount = await prisma.hotel.count({
+      where:{
+      type:{contains: "hotel"}
+      }
+    })
+    const appartmentCount = await prisma.hotel.count({
+      where:{
+      type:{contains: "appartment"}
+      }
+    })
+    const resortCount = await prisma.hotel.count({
+      where:{
+      type:{contains: "resort"}
+      }
+    })
+    const villaCount = await prisma.hotel.count({
+      where:{
+      type:{contains: "villa"}
+      }
+    })
+    res.json([
+      {type: "hotel", count: hotelCount},
+      {type: "appartment", count: appartmentCount},
+      {type: "resort", count: resortCount},
+      {type: "villa", count: villaCount},
+    ])
+  } catch (error) {
+   next(error) 
+  }
+}
+
+
+export const getHotelRooms = async (req:Request, res:Response, next:NextFunction) => {
+  try {
+    const hotelId = req.params.id
+    const hotelRoom = await prisma.hotel.findMany({
+      where:{
+        id: hotelId
+      },
+      select:{
+        rooms:{
+          select:{
+            id: true,
+            title: true,
+            description: true,
+            price: true,
+            maxPeople: true,
+            roomNumbers: true,
+          }
+        }
+      }
+    })
+    res.status(200).json({hotelRoom})
   } catch (error) {
     next(error)
   }

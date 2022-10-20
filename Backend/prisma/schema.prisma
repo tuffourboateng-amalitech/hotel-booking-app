@@ -46,13 +46,21 @@ model Room {
   hotelId String
   maxPeople Int
   description String 
-  roomNumbers Json[]
+  roomNumbers RoomNumbers @relation(fields: [roomNumbersId], references: [id])
+  roomNumbersId String 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
 }
 
+model RoomNumbers{
+  id String @id @default(cuid())
+  number Int[]
+  unavailableDates DateTime[]
+  room Room[]
+}
 
-enum Role{
+
+enum Role {
   User
   Admin
 }

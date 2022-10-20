@@ -46,6 +46,11 @@ export interface Room{
   price: number,
   maxPeople: number,
   description: string,
-  roomNumbers: object[]
+  roomNumbers: RoomNumbers[]
+}
+
+export interface RoomNumbers{
+  number: number[],
+  unavailableDates?: Date[]
 }
 

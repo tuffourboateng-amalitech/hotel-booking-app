@@ -85,7 +85,7 @@ const loginUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function
         });
         const login_User = {
             id: checkUser.id,
-            firstname: checkUser.name,
+            name: checkUser.name,
             role: checkUser.role,
             token,
         };

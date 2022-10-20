@@ -16,6 +16,7 @@
 
 .logo{
     font-weight: 500;
+    font-style: oblique;
 }
 
 .navbutton{
@@ -24,4 +25,8 @@
     padding: 5px 10px;
     cursor: pointer;
     color: purple;
+}
+
+.link{
+    text-decoration: none;
 }

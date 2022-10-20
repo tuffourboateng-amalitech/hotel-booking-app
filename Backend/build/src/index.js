@@ -11,6 +11,8 @@ const dbConnection_1 = require("./config/dbConnection");
 const helmet_1 = __importDefault(require("helmet"));
 const auth_1 = __importDefault(require("./routes/auth"));
 const user_1 = __importDefault(require("./routes/user"));
+const hotel_1 = __importDefault(require("./routes/hotel"));
+const room_1 = __importDefault(require("./routes/room"));
 const app = (0, express_1.default)();
 (0, dotenv_1.config)();
 const PORT = process.env.PORT_NUMBER || 5000;
@@ -24,6 +26,8 @@ app.use((0, helmet_1.default)());
 // Route calls
 app.use('/api/v1', auth_1.default);
 app.use('/api/v1', user_1.default);
+app.use('/api/v1', hotel_1.default);
+app.use('/api/v1', room_1.default);
 app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
 });

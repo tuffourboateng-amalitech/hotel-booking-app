@@ -21,9 +21,14 @@
 
 .propListTitles>h1{
     font-size: 18px;
+    text-transform: capitalize;
 }
 
 .propListTitles>h2{
     font-size: 14px;
-    font-weight: 300
+    font-weight: 300;
+}
+
+.propListTitles>h2::after{
+    content: "s";
 }

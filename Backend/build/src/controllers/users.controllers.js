@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.checkUser = exports.checkAuth = exports.getAllUsers = exports.getUser = void 0;
+exports.checkAdmin = exports.checkUser = exports.checkAuth = exports.updateUser = exports.deleteUser = exports.getAllUsers = exports.getUser = void 0;
 const prismaInit_1 = require("../config/prismaInit");
 const getUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -42,6 +42,42 @@ const getAllUsers = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 exports.getAllUsers = getAllUsers;
+const deleteUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userDelete = yield prismaInit_1.prisma.user.delete({
+            where: {
+                id: req.params.id
+            }
+        });
+        res.json({ userDelete, success: true });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.deleteUser = deleteUser;
+const updateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    try {
+        const { name, email, password } = req.body;
+        const userDelete = yield prismaInit_1.prisma.user.update({
+            where: {
+                id: req.params.id
+            },
+            data: {
+                name,
+                email,
+                password,
+                role: (_a = req.body) === null || _a === void 0 ? void 0 : _a.role
+            }
+        });
+        res.json({ userDelete, success: true });
+    }
+    catch (error) {
+        next(error);
+    }
+});
+exports.updateUser = updateUser;
 // trial
 const checkAuth = (req, res, next) => {
     res.send("User Authenticated");
@@ -52,4 +88,8 @@ const checkUser = (req, res, next) => {
     res.send("Hello user , you are logged in and you can delete your account");
 };
 exports.checkUser = checkUser;
+const checkAdmin = (req, res, next) => {
+    res.send("Hello Admin, you are logged in and you can delete all accounts");
+};
+exports.checkAdmin = checkAdmin;
 //# sourceMappingURL=users.controllers.js.map
